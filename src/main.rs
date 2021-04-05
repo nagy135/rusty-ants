@@ -10,9 +10,9 @@ use iced_native::event::Event;
 use iced_native::keyboard::Event as KeyboardEvent;
 
 pub fn main() -> iced::Result {
-    Clock::run(Settings {
+    Ground::run(Settings {
         window: WindowSettings {
-            size: (400, 200),
+            size: (600, 600),
             ..WindowSettings::default()
         },
         antialiasing: true,
@@ -20,16 +20,9 @@ pub fn main() -> iced::Result {
     })
 }
 
-struct Clock {
-    count: u32,
-    total_work: u32,
-    total_rest: u32,
-    work_sessions: u32,
-    work: bool,
-    now: chrono::DateTime<chrono::Local>,
-    paused: bool,
-    previous: u32,
-    clock: Cache,
+struct Ground {
+    running: bool,
+    cache: Cache,
 }
 
 #[derive(Debug, Clone)]
@@ -38,23 +31,16 @@ enum Message {
     EventOccured(iced_native::Event),
 }
 
-impl Application for Clock {
+impl Application for Ground {
     type Executor = executor::Default;
     type Message = Message;
     type Flags = ();
 
     fn new(_flags: ()) -> (Self, Command<Message>) {
         (
-            Clock {
-                count: 0,
-                total_work: 60,
-                total_rest: 60,
-                work_sessions: 0,
-                work: true,
-                now: chrono::Local::now(),
-                paused: false,
-                previous: chrono::Local::now().minute(),
-                clock: Default::default(),
+            Ground {
+                running: true,
+                cache: Default::default(),
             },
             Command::none(),
         )
@@ -73,7 +59,7 @@ impl Application for Clock {
                 if let Event::Keyboard(keyboard_event) = event {
                     if let KeyboardEvent::CharacterReceived(ch) = keyboard_event {
                         println!("key pressed");
-                        self.clock.clear();
+                        self.cache.clear();
                     }
                 }
             }
@@ -106,21 +92,15 @@ impl Application for Clock {
     }
 }
 
-impl canvas::Program<Message> for Clock {
+impl canvas::Program<Message> for Ground {
     fn draw(&self, bounds: Rectangle, _cursor: Cursor) -> Vec<Geometry> {
-        let clock = self.clock.draw(bounds.size(), |frame| {
+        let clock = self.cache.draw(bounds.size(), |frame| {
             let center = frame.center();
             let radius = frame.width().min(frame.height()) / 2.0;
 
             let background = Path::circle(center, radius);
 
-            let color: Color = match self.paused {
-                false => match self.work {
-                    true => Color::from_rgb8(0xc2, 0x23, 0x30),
-                    false => Color::from_rgb8(0x19, 0xa8, 0x5b),
-                },
-                true => Color::from_rgb8(0x77, 0x77, 0x77),
-            };
+            let color: Color = Color::from_rgb8(0xc2, 0x23, 0x30);
             frame.fill(&background, color);
 
             let short_hand = Path::line(Point::ORIGIN, Point::new(0.0, -0.5 * radius));
