@@ -1,9 +1,8 @@
-use chrono::Timelike;
 use iced::{
-    canvas::{self, Cache, Canvas, Cursor, Geometry, LineCap, Path, Stroke},
+    canvas::{self, Canvas, Cursor, Geometry, Path},
     executor, time,
     window::Settings as WindowSettings,
-    Align, Application, Color, Column, Command, Container, Element, Length, Point, Rectangle, Row,
+    Align, Application, Color, Column, Command, Container, Element, Length, Point, Rectangle,
     Settings, Subscription, Vector,
 };
 use iced_native::event::Event;
@@ -11,10 +10,13 @@ use iced_native::keyboard::Event as KeyboardEvent;
 
 mod anthill;
 
+const SPEED: u64 = 100;
+const WINDOW_SIZE: (u32, u32) = (600, 600);
+
 pub fn main() -> iced::Result {
     anthill::Ground::run(Settings {
         window: WindowSettings {
-            size: (600, 600),
+            size: WINDOW_SIZE,
             ..WindowSettings::default()
         },
         antialiasing: true,
@@ -50,13 +52,13 @@ impl Application for anthill::Ground {
 
     fn update(&mut self, message: Message) -> Command<Message> {
         match message {
-            Message::Tick(local_time) => {
+            Message::Tick(_) => {
                 self.ant.step();
                 self.cache.clear();
             }
             Message::EventOccured(event) => {
                 if let Event::Keyboard(keyboard_event) = event {
-                    if let KeyboardEvent::CharacterReceived(ch) = keyboard_event {
+                    if let KeyboardEvent::CharacterReceived(_ch) = keyboard_event {
                         println!("key pressed");
                         self.cache.clear();
                     }
@@ -70,7 +72,7 @@ impl Application for anthill::Ground {
     fn subscription(&self) -> Subscription<Message> {
         Subscription::batch(vec![
             iced_native::subscription::events().map(Message::EventOccured),
-            time::every(std::time::Duration::from_millis(500))
+            time::every(std::time::Duration::from_millis(SPEED))
                 .map(|_| Message::Tick(chrono::Local::now())),
         ])
     }
@@ -78,8 +80,8 @@ impl Application for anthill::Ground {
     fn view(&mut self) -> Element<Message> {
         let canvas = Container::new(
             Canvas::new(self)
-                .width(Length::Units(600))
-                .height(Length::Units(600)),
+                .width(Length::Units(WINDOW_SIZE.0 as u16))
+                .height(Length::Units(WINDOW_SIZE.1 as u16)),
         )
         .width(Length::Fill)
         .height(Length::Fill)
@@ -95,14 +97,12 @@ impl canvas::Program<Message> for anthill::Ground {
         let ground = self.cache.draw(bounds.size(), |frame| {
             let center = frame.center();
 
-            let ant = Path::circle(Point::new(self.ant.x, self.ant.y), 5f32);
+            let ant = Path::circle(Point::new(self.ant.x, self.ant.y), anthill::ANT_SIZE);
 
             frame.translate(Vector::new(center.x, center.y));
-            let color: Color = Color::from_rgb8(0xc2, 0x23, 0x30);
+            let red: Color = Color::from_rgb8(0xc2, 0x23, 0x30);
 
-            frame.with_save(|frame| {
-                frame.fill(&ant, color);
-            });
+            frame.fill(&ant, red);
         });
 
         vec![ground]

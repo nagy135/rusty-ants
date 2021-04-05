@@ -1,6 +1,7 @@
 use iced::canvas::Cache;
 
 const STEP_SIZE: f32 = 5f32;
+pub const ANT_SIZE: f32 = 2f32;
 
 pub struct Ground {
     pub running: bool,
