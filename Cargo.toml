@@ -9,6 +9,7 @@ edition = "2018"
 [dependencies]
 chrono = "0.4"
 play = "0.5.3"
+rand = "0.8.3"
 
 [dependencies.iced]
 version = "0.2.0"
