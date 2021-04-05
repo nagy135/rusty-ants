@@ -9,8 +9,10 @@ use iced::{
 use iced_native::event::Event;
 use iced_native::keyboard::Event as KeyboardEvent;
 
+mod anthill;
+
 pub fn main() -> iced::Result {
-    Ground::run(Settings {
+    anthill::Ground::run(Settings {
         window: WindowSettings {
             size: (600, 600),
             ..WindowSettings::default()
@@ -20,27 +22,23 @@ pub fn main() -> iced::Result {
     })
 }
 
-struct Ground {
-    running: bool,
-    cache: Cache,
-}
-
 #[derive(Debug, Clone)]
-enum Message {
+pub enum Message {
     Tick(chrono::DateTime<chrono::Local>),
     EventOccured(iced_native::Event),
 }
 
-impl Application for Ground {
+impl Application for anthill::Ground {
     type Executor = executor::Default;
     type Message = Message;
     type Flags = ();
 
     fn new(_flags: ()) -> (Self, Command<Message>) {
         (
-            Ground {
+            anthill::Ground {
                 running: true,
                 cache: Default::default(),
+                ant: anthill::Ant::new(0f32, 100f32),
             },
             Command::none(),
         )
@@ -53,7 +51,8 @@ impl Application for Ground {
     fn update(&mut self, message: Message) -> Command<Message> {
         match message {
             Message::Tick(local_time) => {
-                println!("tick");
+                self.ant.step();
+                self.cache.clear();
             }
             Message::EventOccured(event) => {
                 if let Event::Keyboard(keyboard_event) = event {
@@ -79,53 +78,33 @@ impl Application for Ground {
     fn view(&mut self) -> Element<Message> {
         let canvas = Container::new(
             Canvas::new(self)
-                .width(Length::Units(100))
-                .height(Length::Units(100)),
+                .width(Length::Units(600))
+                .height(Length::Units(600)),
         )
         .width(Length::Fill)
         .height(Length::Fill)
-        .padding(5)
         .align_x(Align::End)
         .center_y();
 
-        Column::new().padding(20).push(canvas).into()
+        Column::new().push(canvas).into()
     }
 }
 
-impl canvas::Program<Message> for Ground {
+impl canvas::Program<Message> for anthill::Ground {
     fn draw(&self, bounds: Rectangle, _cursor: Cursor) -> Vec<Geometry> {
-        let clock = self.cache.draw(bounds.size(), |frame| {
+        let ground = self.cache.draw(bounds.size(), |frame| {
             let center = frame.center();
-            let radius = frame.width().min(frame.height()) / 2.0;
 
-            let background = Path::circle(center, radius);
-
-            let color: Color = Color::from_rgb8(0xc2, 0x23, 0x30);
-            frame.fill(&background, color);
-
-            let short_hand = Path::line(Point::ORIGIN, Point::new(0.0, -0.5 * radius));
-            let long_hand = Path::line(Point::ORIGIN, Point::new(0.0, -0.8 * radius));
-
-            let thin_stroke = Stroke {
-                width: radius / 100.0,
-                color: Color::WHITE,
-                line_cap: LineCap::Round,
-                ..Stroke::default()
-            };
-
-            let wide_stroke = Stroke {
-                width: thin_stroke.width * 3.0,
-                ..thin_stroke
-            };
+            let ant = Path::circle(Point::new(self.ant.x, self.ant.y), 5f32);
 
             frame.translate(Vector::new(center.x, center.y));
+            let color: Color = Color::from_rgb8(0xc2, 0x23, 0x30);
 
             frame.with_save(|frame| {
-                frame.rotate(2f32);
-                frame.stroke(&short_hand, wide_stroke);
+                frame.fill(&ant, color);
             });
         });
 
-        vec![clock]
+        vec![ground]
     }
 }
