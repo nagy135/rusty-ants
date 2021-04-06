@@ -1,6 +1,9 @@
 use iced::canvas::Cache;
+use rand::random;
 
 const STEP_SIZE: f32 = 5f32;
+const DEFAULT_SPREAD: f32 = 150f32;
+const HEADING_CHANGE: f32 = 180f32;
 pub const ANT_SIZE: f32 = 2f32;
 
 pub struct Ground {
@@ -29,5 +32,6 @@ impl Ant {
         let heading = self.heading * std::f32::consts::PI / 180f32;
         self.x = self.x + (STEP_SIZE * heading.cos());
         self.y = self.y - (STEP_SIZE * heading.sin());
+        self.heading += (random::<u32>() as f32) % HEADING_CHANGE;
     }
 }
