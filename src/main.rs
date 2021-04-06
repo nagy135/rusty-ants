@@ -13,6 +13,9 @@ mod anthill;
 const SPEED: u64 = 100;
 const SWARM_SIZE: i32 = 100;
 const WINDOW_SIZE: (u32, u32) = (600, 600);
+const ANTS_LOCATION: (f32, f32) = (300f32, 300f32);
+const FOOD_LOCATION: (f32, f32) = (50f32, 50f32);
+const FOOD_SIZE: (u32, u32) = (10, 10);
 
 pub fn main() -> iced::Result {
     anthill::Ground::run(Settings {
@@ -41,8 +44,13 @@ impl Application for anthill::Ground {
             anthill::Ground {
                 running: true,
                 cache: Default::default(),
-                ants: anthill::Ant::spawn(SWARM_SIZE, 300f32, 300f32, None),
-                food: anthill::Food::spawn(100f32, 100f32, 10, 10),
+                ants: anthill::Ant::spawn(SWARM_SIZE, ANTS_LOCATION.0, ANTS_LOCATION.1, None),
+                food: anthill::Food::spawn(
+                    FOOD_LOCATION.0,
+                    FOOD_LOCATION.1,
+                    FOOD_SIZE.0,
+                    FOOD_SIZE.1,
+                ),
             },
             Command::none(),
         )
