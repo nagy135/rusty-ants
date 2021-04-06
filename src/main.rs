@@ -3,7 +3,7 @@ use iced::{
     executor, time,
     window::Settings as WindowSettings,
     Align, Application, Color, Column, Command, Container, Element, Length, Point, Rectangle,
-    Settings, Subscription, Vector,
+    Settings, Subscription,
 };
 use iced_native::event::Event;
 use iced_native::keyboard::Event as KeyboardEvent;
@@ -11,6 +11,7 @@ use iced_native::keyboard::Event as KeyboardEvent;
 mod anthill;
 
 const SPEED: u64 = 100;
+const SWARM_SIZE: i32 = 100;
 const WINDOW_SIZE: (u32, u32) = (600, 600);
 
 pub fn main() -> iced::Result {
@@ -40,7 +41,7 @@ impl Application for anthill::Ground {
             anthill::Ground {
                 running: true,
                 cache: Default::default(),
-                ants: anthill::Ant::spawn(135, 300f32, 300f32, None),
+                ants: anthill::Ant::spawn(SWARM_SIZE, 300f32, 300f32, None),
             },
             Command::none(),
         )
