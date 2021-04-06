@@ -111,6 +111,7 @@ impl canvas::Program<Message> for anthill::Ground {
 
             // frame.translate(Vector::new(center.x, center.y));
             let red: Color = Color::from_rgb8(0xc2, 0x23, 0x30);
+            let blue: Color = Color::from_rgb8(0x02, 0x13, 0xca);
 
             for ant in &self.ants {
                 let ant_circle = Path::circle(Point::new(ant.x, ant.y), anthill::ANT_SIZE);
@@ -118,7 +119,7 @@ impl canvas::Program<Message> for anthill::Ground {
             }
             for food in &self.food {
                 let food_circle = Path::circle(Point::new(food.x, food.y), anthill::FOOD_SIZE);
-                frame.fill(&food_circle, red);
+                frame.fill(&food_circle, blue);
             }
         });
 
