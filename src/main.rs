@@ -42,6 +42,7 @@ impl Application for anthill::Ground {
                 running: true,
                 cache: Default::default(),
                 ants: anthill::Ant::spawn(SWARM_SIZE, 300f32, 300f32, None),
+                food: anthill::Food::spawn(100f32, 100f32, 10, 10),
             },
             Command::none(),
         )
@@ -106,6 +107,10 @@ impl canvas::Program<Message> for anthill::Ground {
             for ant in &self.ants {
                 let ant_circle = Path::circle(Point::new(ant.x, ant.y), anthill::ANT_SIZE);
                 frame.fill(&ant_circle, red);
+            }
+            for food in &self.food {
+                let food_circle = Path::circle(Point::new(food.x, food.y), anthill::FOOD_SIZE);
+                frame.fill(&food_circle, red);
             }
         });
 
