@@ -40,7 +40,7 @@ impl Application for anthill::Ground {
             anthill::Ground {
                 running: true,
                 cache: Default::default(),
-                ant: anthill::Ant::new(0f32, 100f32),
+                ants: anthill::Ant::spawn(135, 300f32, 300f32, None),
             },
             Command::none(),
         )
@@ -53,7 +53,9 @@ impl Application for anthill::Ground {
     fn update(&mut self, message: Message) -> Command<Message> {
         match message {
             Message::Tick(_) => {
-                self.ant.step();
+                for i in 0..self.ants.len() {
+                    self.ants[i].step();
+                }
                 self.cache.clear();
             }
             Message::EventOccured(event) => {
@@ -95,14 +97,15 @@ impl Application for anthill::Ground {
 impl canvas::Program<Message> for anthill::Ground {
     fn draw(&self, bounds: Rectangle, _cursor: Cursor) -> Vec<Geometry> {
         let ground = self.cache.draw(bounds.size(), |frame| {
-            let center = frame.center();
+            let _center = frame.center();
 
-            let ant = Path::circle(Point::new(self.ant.x, self.ant.y), anthill::ANT_SIZE);
-
-            frame.translate(Vector::new(center.x, center.y));
+            // frame.translate(Vector::new(center.x, center.y));
             let red: Color = Color::from_rgb8(0xc2, 0x23, 0x30);
 
-            frame.fill(&ant, red);
+            for ant in &self.ants {
+                let ant_circle = Path::circle(Point::new(ant.x, ant.y), anthill::ANT_SIZE);
+                frame.fill(&ant_circle, red);
+            }
         });
 
         vec![ground]
