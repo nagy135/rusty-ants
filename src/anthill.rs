@@ -5,7 +5,6 @@ const STEP_SIZE: f32 = 5f32;
 const DEFAULT_SPREAD: f32 = 150f32;
 const HEADING_CHANGE: f32 = 180f32;
 pub const ANT_SIZE: f32 = 2f32;
-pub const FOOD_SIZE: f32 = 5f32;
 
 pub struct Ground {
     pub running: bool,
@@ -24,18 +23,21 @@ pub struct Ant {
 pub struct Food {
     pub x: f32,
     pub y: f32,
+    pub width: f32,
+    pub height: f32,
 }
 
 impl Food {
-    pub fn spawn(x: f32, y: f32, width: u32, height: u32) -> Vec<Food> {
+    /// positions: (x, y, width, height)
+    pub fn spawn(locations: Vec<(f32, f32, f32, f32)>) -> Vec<Food> {
         let mut food: Vec<Food> = Vec::new();
-        for i in 0..height {
-            for j in 0..width {
-                food.push(Food {
-                    x: x + j as f32 * FOOD_SIZE,
-                    y: y + i as f32 * FOOD_SIZE,
-                })
-            }
+        for loc in locations {
+            food.push(Food {
+                x: loc.0,
+                y: loc.1,
+                width: loc.2,
+                height: loc.3,
+            });
         }
         food
     }

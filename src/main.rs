@@ -3,7 +3,7 @@ use iced::{
     executor, time,
     window::Settings as WindowSettings,
     Align, Application, Color, Column, Command, Container, Element, Length, Point, Rectangle,
-    Settings, Subscription,
+    Settings, Size, Subscription,
 };
 use iced_native::event::Event;
 use iced_native::keyboard::Event as KeyboardEvent;
@@ -15,7 +15,7 @@ const SWARM_SIZE: i32 = 100;
 const WINDOW_SIZE: (u32, u32) = (600, 600);
 const ANTS_LOCATION: (f32, f32) = (300f32, 300f32);
 const FOOD_LOCATION: (f32, f32) = (50f32, 50f32);
-const FOOD_SIZE: (u32, u32) = (10, 10);
+const FOOD_SIZE: (f32, f32) = (40f32, 40f32);
 
 pub fn main() -> iced::Result {
     anthill::Ground::run(Settings {
@@ -45,12 +45,12 @@ impl Application for anthill::Ground {
                 running: true,
                 cache: Default::default(),
                 ants: anthill::Ant::spawn(SWARM_SIZE, ANTS_LOCATION.0, ANTS_LOCATION.1, None),
-                food: anthill::Food::spawn(
+                food: anthill::Food::spawn(vec![(
                     FOOD_LOCATION.0,
                     FOOD_LOCATION.1,
                     FOOD_SIZE.0,
                     FOOD_SIZE.1,
-                ),
+                )]),
             },
             Command::none(),
         )
@@ -118,7 +118,10 @@ impl canvas::Program<Message> for anthill::Ground {
                 frame.fill(&ant_circle, red);
             }
             for food in &self.food {
-                let food_circle = Path::circle(Point::new(food.x, food.y), anthill::FOOD_SIZE);
+                let food_circle = Path::rectangle(
+                    Point::new(food.x, food.y),
+                    Size::new(food.width, food.height),
+                );
                 frame.fill(&food_circle, blue);
             }
         });
