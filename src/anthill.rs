@@ -76,6 +76,6 @@ impl Ant {
         let heading = self.heading * std::f32::consts::PI / 180f32;
         self.x = self.x + (STEP_SIZE * heading.cos());
         self.y = self.y - (STEP_SIZE * heading.sin());
-        self.heading += (random::<u32>() as f32) % HEADING_CHANGE;
+        self.heading += (random::<f32>().trunc()) % HEADING_CHANGE;
     }
 }
