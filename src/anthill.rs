@@ -13,6 +13,7 @@ pub struct Ground {
     pub food: Vec<Food>,
 }
 
+#[derive(Debug)]
 pub struct Ant {
     pub x: f32,
     pub y: f32,
@@ -20,6 +21,7 @@ pub struct Ant {
     pub carrying: bool,
 }
 
+#[derive(Debug)]
 pub struct Food {
     pub x: f32,
     pub y: f32,

@@ -11,10 +11,10 @@ use iced_native::keyboard::Event as KeyboardEvent;
 mod anthill;
 
 const SPEED: u64 = 100;
-const SWARM_SIZE: i32 = 100;
+const SWARM_SIZE: i32 = 10;
 const WINDOW_SIZE: (u32, u32) = (600, 600);
-const ANTS_LOCATION: (f32, f32) = (300f32, 300f32);
-const FOOD_LOCATION: (f32, f32) = (50f32, 50f32);
+const ANTS_LOCATION: (f32, f32) = (400f32, 300f32);
+const FOOD_LOCATION: (f32, f32) = (300f32, 250f32);
 const FOOD_SIZE: (f32, f32) = (40f32, 40f32);
 
 pub fn main() -> iced::Result {
@@ -65,6 +65,18 @@ impl Application for anthill::Ground {
             Message::Tick(_) => {
                 for i in 0..self.ants.len() {
                     self.ants[i].step();
+                    for food in &self.food {
+                        let x = self.ants[i].x;
+                        let y = self.ants[i].y;
+                        if !self.ants[i].carrying
+                            && x > food.x
+                            && y > food.y
+                            && x < food.x + food.width
+                            && y < food.y + food.height
+                        {
+                            self.ants[i].carrying = true;
+                        }
+                    }
                 }
                 self.cache.clear();
             }
@@ -112,10 +124,17 @@ impl canvas::Program<Message> for anthill::Ground {
             // frame.translate(Vector::new(center.x, center.y));
             let red: Color = Color::from_rgb8(0xc2, 0x23, 0x30);
             let blue: Color = Color::from_rgb8(0x02, 0x13, 0xca);
+            let green: Color = Color::from_rgb8(0x02, 0xc3, 0x2a);
 
             for ant in &self.ants {
                 let ant_circle = Path::circle(Point::new(ant.x, ant.y), anthill::ANT_SIZE);
-                frame.fill(&ant_circle, red);
+                frame.fill(
+                    &ant_circle,
+                    match ant.carrying {
+                        true => green,
+                        false => red,
+                    },
+                );
             }
             for food in &self.food {
                 let food_circle = Path::rectangle(
