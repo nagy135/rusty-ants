@@ -51,7 +51,7 @@ impl Ant {
         Ant {
             x,
             y,
-            heading: random::<u32>() as f32, // to remove remainder
+            heading: random::<f32>().trunc(),
             carrying: false,
         }
     }
@@ -65,7 +65,7 @@ impl Ant {
             ant_group.push(Ant {
                 x: center_x + (random::<f32>() % spread),
                 y: center_y + (random::<f32>() % spread),
-                heading: random::<u32>() as f32,
+                heading: random::<f32>().trunc(),
                 carrying: false,
             });
         }
