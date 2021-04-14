@@ -51,6 +51,7 @@ impl Application for anthill::Ground {
                     FOOD_SIZE.0,
                     FOOD_SIZE.1,
                 )]),
+                pheromones: anthill::Pheromones::new(WINDOW_SIZE),
             },
             Command::none(),
         )

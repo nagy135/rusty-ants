@@ -3,7 +3,7 @@ use rand::random;
 
 const STEP_SIZE: f32 = 5f32;
 const DEFAULT_SPREAD: f32 = 20f32;
-const HEADING_CHANGE: f32 = 180f32;
+const HEADING_CHANGE: f32 = 20f32;
 pub const ANT_SIZE: f32 = 2f32;
 
 pub struct Ground {
@@ -11,6 +11,13 @@ pub struct Ground {
     pub cache: Cache,
     pub ants: Vec<Ant>,
     pub food: Vec<Food>,
+    pub pheromones: Pheromones,
+}
+
+#[derive(Debug)]
+pub struct Pheromones {
+    location: Vec<u8>,
+    width: u32,
 }
 
 #[derive(Debug)]
@@ -27,6 +34,15 @@ pub struct Food {
     pub y: f32,
     pub width: f32,
     pub height: f32,
+}
+
+impl Pheromones {
+    pub fn new(size: (u32, u32)) -> Pheromones {
+        Pheromones {
+            location: Vec::with_capacity(size.0 as usize * size.1 as usize),
+            width: size.0,
+        }
+    }
 }
 
 impl Food {
