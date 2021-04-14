@@ -2,7 +2,7 @@ use iced::canvas::Cache;
 use rand::random;
 
 const STEP_SIZE: f32 = 5f32;
-const DEFAULT_SPREAD: f32 = 150f32;
+const DEFAULT_SPREAD: f32 = 20f32;
 const HEADING_CHANGE: f32 = 180f32;
 pub const ANT_SIZE: f32 = 2f32;
 
@@ -65,7 +65,7 @@ impl Ant {
             ant_group.push(Ant {
                 x: center_x + (random::<f32>() % spread),
                 y: center_y + (random::<f32>() % spread),
-                heading: random::<f32>().trunc(),
+                heading: (random::<i32>() % 360) as f32,
                 carrying: false,
             });
         }
@@ -76,6 +76,7 @@ impl Ant {
         let heading = self.heading * std::f32::consts::PI / 180f32;
         self.x = self.x + (STEP_SIZE * heading.cos());
         self.y = self.y - (STEP_SIZE * heading.sin());
-        self.heading += (random::<f32>().trunc()) % HEADING_CHANGE;
+        let new_heading = random::<f32>() * 100f32;
+        self.heading += new_heading % HEADING_CHANGE;
     }
 }

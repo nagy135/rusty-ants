@@ -10,11 +10,11 @@ use iced_native::keyboard::Event as KeyboardEvent;
 
 mod anthill;
 
-const SPEED: u64 = 100;
-const SWARM_SIZE: i32 = 10;
+const SPEED: u64 = 200;
+const SWARM_SIZE: i32 = 50;
 const WINDOW_SIZE: (u32, u32) = (600, 600);
-const ANTS_LOCATION: (f32, f32) = (400f32, 300f32);
-const FOOD_LOCATION: (f32, f32) = (300f32, 250f32);
+const ANTS_LOCATION: (f32, f32) = (200f32, 200f32);
+const FOOD_LOCATION: (f32, f32) = (100f32, 100f32);
 const FOOD_SIZE: (f32, f32) = (40f32, 40f32);
 
 pub fn main() -> iced::Result {
