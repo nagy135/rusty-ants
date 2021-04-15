@@ -3,7 +3,7 @@ use rand::random;
 
 const STEP_SIZE: f32 = 5f32;
 const DEFAULT_SPREAD: f32 = 20f32;
-const HEADING_CHANGE: f32 = 20f32;
+const HEADING_CHANGE: f32 = 60f32;
 pub const ANT_SIZE: f32 = 2f32;
 
 pub struct Ground {
@@ -16,8 +16,14 @@ pub struct Ground {
 
 #[derive(Debug)]
 pub struct Pheromones {
-    location: Vec<u8>,
-    width: u32,
+    location: Vec<Vec<PheromoneTypes>>,
+}
+
+#[derive(Debug, Clone)]
+enum PheromoneTypes {
+    None,
+    ToFood,
+    ToHome,
 }
 
 #[derive(Debug)]
@@ -39,9 +45,16 @@ pub struct Food {
 impl Pheromones {
     pub fn new(size: (u32, u32)) -> Pheromones {
         Pheromones {
-            location: Vec::with_capacity(size.0 as usize * size.1 as usize),
-            width: size.0,
+            location: vec![vec![PheromoneTypes::None; size.0 as usize]; size.1 as usize],
         }
+    }
+    pub fn update(&mut self, ant: &Ant) {
+        let pheromone: PheromoneTypes = match ant.carrying {
+            true => PheromoneTypes::ToFood,
+            false => PheromoneTypes::ToHome,
+        };
+        dbg!(&self.location);
+        self.location[ant.y as usize][ant.x as usize] = pheromone;
     }
 }
 
@@ -93,6 +106,6 @@ impl Ant {
         self.x = self.x + (STEP_SIZE * heading.cos());
         self.y = self.y - (STEP_SIZE * heading.sin());
         let new_heading = random::<f32>() * 100f32;
-        self.heading += new_heading % HEADING_CHANGE;
+        self.heading += new_heading % (2f32 * HEADING_CHANGE) - HEADING_CHANGE;
     }
 }

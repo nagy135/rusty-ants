@@ -78,6 +78,7 @@ impl Application for anthill::Ground {
                             self.ants[i].carrying = true;
                         }
                     }
+                    self.pheromones.update(&self.ants[i]);
                 }
                 self.cache.clear();
             }
