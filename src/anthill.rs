@@ -53,7 +53,6 @@ impl Pheromones {
             true => PheromoneTypes::ToFood,
             false => PheromoneTypes::ToHome,
         };
-        dbg!(&self.location);
         self.location[ant.y as usize][ant.x as usize] = pheromone;
     }
 }
