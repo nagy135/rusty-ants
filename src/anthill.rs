@@ -6,6 +6,17 @@ const DEFAULT_SPREAD: f32 = 20f32;
 const HEADING_CHANGE: f32 = 60f32;
 pub const ANT_SIZE: f32 = 2f32;
 
+const TO_LOOK_POSITIONS: [(f32, f32, f32); 8] = [
+    (-1f32, -1f32, 135f32), // top left
+    (0f32, -1f32, 90f32),   // top
+    (1f32, -1f32, 45f32),   // top right
+    (1f32, 0f32, 0f32),     // right
+    (1f32, 1f32, 315f32),   // bottom right
+    (0f32, 1f32, 270f32),   // bottom
+    (-1f32, 1f32, 225f32),  // bottom left
+    (-1f32, 0f32, 180f32),  // left
+];
+
 pub struct Ground {
     pub running: bool,
     pub cache: Cache,
@@ -16,11 +27,11 @@ pub struct Ground {
 
 #[derive(Debug)]
 pub struct Pheromones {
-    location: Vec<Vec<PheromoneTypes>>,
+    pub location: Vec<Vec<PheromoneTypes>>,
 }
 
 #[derive(Debug, Clone)]
-enum PheromoneTypes {
+pub enum PheromoneTypes {
     None,
     ToFood,
     ToHome,
@@ -100,11 +111,39 @@ impl Ant {
         ant_group
     }
 
-    pub fn step(&mut self) {
+    pub fn step(&mut self, pheromones: &Pheromones) {
         let heading = self.heading * std::f32::consts::PI / 180f32;
         self.x = self.x + (STEP_SIZE * heading.cos());
         self.y = self.y - (STEP_SIZE * heading.sin());
-        let new_heading = random::<f32>() * 100f32;
-        self.heading += new_heading % (2f32 * HEADING_CHANGE) - HEADING_CHANGE;
+
+        let mut new_heading: Option<f32> = None;
+
+        let max_x = pheromones.location[0].len() as f32 - 1f32;
+        let max_y = pheromones.location.len() as f32 - 1f32;
+        for (pos_x, pos_y, pos_head) in TO_LOOK_POSITIONS.iter() {
+            let x = self.x + pos_x;
+            let y = self.y + pos_y;
+            if x < 0f32 || y < 0f32 || x > max_x || y > max_y {
+                continue;
+            }
+            match pheromones.location[y as usize][x as usize] {
+                PheromoneTypes::ToHome => {
+                    new_heading = Some(*pos_head);
+                    break;
+                }
+                PheromoneTypes::ToFood => {
+                    new_heading = Some(*pos_head);
+                    break;
+                }
+                PheromoneTypes::None => {}
+            }
+        }
+        match new_heading {
+            Some(x) => self.heading = x,
+            None => {
+                let new_heading = random::<f32>() * 100f32;
+                self.heading += new_heading % (2f32 * HEADING_CHANGE) - HEADING_CHANGE;
+            }
+        }
     }
 }

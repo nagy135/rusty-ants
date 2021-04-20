@@ -11,7 +11,7 @@ use iced_native::keyboard::Event as KeyboardEvent;
 mod anthill;
 
 const SPEED: u64 = 200;
-const SWARM_SIZE: i32 = 50;
+const SWARM_SIZE: i32 = 10;
 const WINDOW_SIZE: (u32, u32) = (600, 600);
 const ANTS_LOCATION: (f32, f32) = (200f32, 200f32);
 const FOOD_LOCATION: (f32, f32) = (100f32, 100f32);
@@ -65,7 +65,7 @@ impl Application for anthill::Ground {
         match message {
             Message::Tick(_) => {
                 for i in 0..self.ants.len() {
-                    self.ants[i].step();
+                    self.ants[i].step(&self.pheromones);
                     for food in &self.food {
                         let x = self.ants[i].x;
                         let y = self.ants[i].y;
@@ -133,6 +133,21 @@ impl canvas::Program<Message> for anthill::Ground {
                     Size::new(food.width, food.height),
                 );
                 frame.fill(&food_circle, blue);
+            }
+
+            for y in 0..self.pheromones.location.len() {
+                for x in 0..self.pheromones.location[0].len() {
+                    match self.pheromones.location[y][x] {
+                        anthill::PheromoneTypes::None => {}
+                        _ => {
+                            let pheromone_spot = Path::rectangle(
+                                Point::new(x as f32, y as f32),
+                                Size::new(3f32, 3f32),
+                            );
+                            frame.fill(&&pheromone_spot, green);
+                        }
+                    }
+                }
             }
 
             for ant in &self.ants {
